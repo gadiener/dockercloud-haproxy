@@ -8,7 +8,9 @@ from compose.cli.docker_client import docker_client
 import config
 import helper.backend_helper as BackendHelper
 import helper.cloud_mode_link_helper as CloudModeLinkHelper
+import helper.compose_mode_helper as ComposeModeHelper
 import helper.compose_mode_link_helper as ComposeModeLinkHelper
+import helper.compose_mode_network_helper as ComposeModeNetworksHelper
 import helper.config_helper as ConfigHelper
 import helper.frontend_helper as FrontendHelper
 import helper.ssl_helper as SslHelper
@@ -75,7 +77,7 @@ class Haproxy(object):
         if running_mode == RunningMode.CloudMode:
             links = Haproxy._init_cloud_links()
             specs = NewSpecs(links)
-        elif running_mode == RunningMode.ComposeMode:
+        elif running_mode == RunningMode.ComposeLinkMode:
             links = Haproxy._init_compose_mode_links()
             if links is None:
                 specs = LegacySpecs()
@@ -152,7 +154,7 @@ class Haproxy(object):
                 Haproxy.cls_linked_services.update(additional_services)
 
         logger.info("Linked service: %s", ", ".join(ComposeModeLinkHelper.get_service_links_str(links)))
-        logger.info("Linked container: %s", ", ".join(ComposeModeLinkHelper.get_container_links_str(links)))
+        logger.info("Linked container: %s", ", ".join(ComposeModeHelper.get_container_links_str(links)))
         return links
 
     def update(self):

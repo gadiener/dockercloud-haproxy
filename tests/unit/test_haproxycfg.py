@@ -13,7 +13,7 @@ class HaproxyInitTestCase(unittest.TestCase):
     @mock.patch.object(haproxycfg.Haproxy, '_init_cloud_links')
     @mock.patch.object(haproxycfg.Haproxy, '_init_compose_mode_links')
     def test_initialize(self, mock__init_compose_mode_links, mock_init_cloud_links):
-        self.assertTrue(isinstance(Haproxy._initialize(RunningMode.ComposeMode), NewSpecs))
+        self.assertTrue(isinstance(Haproxy._initialize(RunningMode.ComposeLinkMode), NewSpecs))
         self.assertTrue(isinstance(Haproxy._initialize(RunningMode.CloudMode), NewSpecs))
         self.assertTrue(isinstance(Haproxy._initialize(RunningMode.LegacyMode), LegacySpecs))
         self.assertTrue(isinstance(Haproxy._initialize("other"), LegacySpecs))

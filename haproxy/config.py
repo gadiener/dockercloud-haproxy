@@ -6,7 +6,7 @@ logger = logging.getLogger("haproxy")
 
 
 class RunningMode():
-    LegacyMode, ComposeMode, SwarmMode, CloudMode = range(4)
+    LegacyMode, ComposeLinkMode, ComposeNetworkMode, SwarmMode, CloudMode = range(5)
 
 
 def parse_extra_bind_settings(extra_bind_settings):
