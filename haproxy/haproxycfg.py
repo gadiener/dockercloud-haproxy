@@ -89,6 +89,12 @@ class Haproxy(object):
                 specs = LegacySpecs()
             else:
                 specs = NewSpecs(links)
+        elif running_mode == RunningMode.ComposeNetworkMode:
+            links = Haproxy._init_compose_mode_network()
+            if links is None:
+                specs = LegacySpecs()
+            else:
+                specs = NewSpecs(links)
         else:
             specs = LegacySpecs()
         return specs
@@ -154,6 +160,29 @@ class Haproxy(object):
                 Haproxy.cls_linked_services.update(additional_services)
 
         logger.info("Linked service: %s", ", ".join(ComposeModeLinkHelper.get_service_links_str(links)))
+        logger.info("Linked container: %s", ", ".join(ComposeModeHelper.get_container_links_str(links)))
+        return links
+
+    @staticmethod
+    def _init_compose_mode_network():
+        try:
+            try:
+                docker = docker_client()
+            except:
+                docker = docker_client(os.environ)
+            docker.ping()
+            container_id = os.environ.get("HOSTNAME", "")
+            haproxy_container = docker.inspect_container(container_id)
+        except Exception as e:
+            logger.info("Docker API error, regressing to legacy links mode: %s" % e)
+            return None
+        try:
+            links, Haproxy.cls_linked_services = ComposeModeNetworksHelper.get_compose_mode_networks(docker, haproxy_container)
+        except Exception as e:
+            logger.info("Docker API error, regressing to legacy links mode: %s" % e)
+            return None
+        
+        logger.info("Linked service: %s", ", ".join(ComposeModeHelper.get_service_links_str(links)))
         logger.info("Linked container: %s", ", ".join(ComposeModeHelper.get_container_links_str(links)))
         return links
 

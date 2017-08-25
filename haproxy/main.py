@@ -57,6 +57,8 @@ def main():
     elif config.RUNNING_MODE == RunningMode.ComposeLinkMode:
         add_haproxy_run_task("Initial start - Compose Link Mode")
         gevent.spawn(listen_docker_events_compose_mode)
+    elif config.RUNNING_MODE == RunningMode.ComposeNetworkMode:
+        add_haproxy_run_task("Initial start - Compose Network Mode")
         gevent.spawn(listen_docker_events_compose_mode)
     elif config.RUNNING_MODE == RunningMode.SwarmMode:
         add_haproxy_run_task("Initial start - Swarm Mode")
@@ -120,6 +122,7 @@ def check_running_mode(container_uri, service_uri, api_auth):
                         if labels.get("com.docker.swarm.service.id", ""):
                             mode = RunningMode.SwarmMode
                         elif labels.get("com.docker.compose.project", ""):
+                            mode = RunningMode.ComposeNetworkMode
                             #mode = RunningMode.ComposeLinkMode
                         else:
                             reason = "dockercloud/haproxy container doesn't contain any compose or swarm labels"
@@ -133,6 +136,8 @@ def check_running_mode(container_uri, service_uri, api_auth):
             msg = "Haproxy is running using legacy link, loading HAProxy definition from environment variables: %s" % reason
         elif mode == RunningMode.ComposeLinkMode:
             msg = "Haproxy is running by docker-compose, loading HAProxy definition through docker links api"
+        elif mode == RunningMode.ComposeNetworkMode:
+            msg = "Haproxy is running by docker-compose, loading HAProxy definition through docker networks api"
         elif mode == RunningMode.SwarmMode:
             msg = "Haproxy is running in SwarmMode, loading HAProxy definition through docker api"
 
